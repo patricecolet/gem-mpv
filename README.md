@@ -8,6 +8,7 @@ windows building with msys64
 You need a recent version of Gem installed locally and the libmpv at least version 0.27.2.
 
 https://github.com/mpv-player/mpv/blob/master/DOCS/compile-windows.md
+
     cd ~
     git clone https://github.com/umlaeute/Gem.git
     
