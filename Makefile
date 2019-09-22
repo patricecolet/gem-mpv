@@ -11,7 +11,7 @@ class.sources = gem_mpv.cpp
 # all extra files to be included in binary distribution of the library
 datafiles =
 
-ldlibs = -L/c/msys64/home/Patrice/Gem/src/.libs  -L/c/msys64/home/Patrice/Gem/src/Utils/.libs -lmpv -lGem -lopengl32
+ldlibs = -L/c/msys64/home/Patrice/Gem/src/.libs -lmpv -lGem -lopengl32
 cflags = -I/c/msys64/home/Patrice/Gem/src -DHAVE_STRUCT_TIMESPEC 
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
