@@ -18,7 +18,7 @@ build:w64 section
     cd ~/gem-mpv
     make
 
-Then you will find a `gem_mpv.dll` in the root folder.
+Then you will find a `gem_mpv.dll` in gem-mpv folder.
 
 this is a fork from : https://github.com/avilleret/gem-mpv
 
