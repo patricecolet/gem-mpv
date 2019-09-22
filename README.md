@@ -1,18 +1,22 @@
 # gem-mpv
 
 Bring the power of `libmpv` into `Gem`.
+windows building with msys64
 
 ## Building
 
 You need a recent version of Gem installed locally and the libmpv at least version 0.27.2.
 
-    git clone https://github.com/avilleret/gem-mpv.git
-    mkdir build
-    cd build
-    cmake ../gem-mpv
-    cmake --build .
+    https://github.com/mpv-player/mpv/blob/master/DOCS/compile-windows.md
+    
+    git clone https://github.com/umlaeute/Gem.git
+    follow instruction in https://github.com/umlaeute/Gem/blob/master/.git-ci/gitlab-iem.yml 
+    build:w64 section
+and
+    make
 
-Then you will find a `gem-mpv.pd_linux` in the `build` folder.
+Then you will find a `gem_mpv.dll` in the `build` folder.
 Put it in your Pd search path and start playing around.
 
 Feel free to report issue on the tracker : https://github.com/avilleret/gem-mpv/issues
+
