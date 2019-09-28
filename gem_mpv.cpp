@@ -13,7 +13,15 @@ static void wakeup(void *ctx)
 static void *get_proc_address_mpv(void *fn_ctx, const char *name)
 {
   // TODO adapt for Windows and MacOS
+#ifndef _WIN32
   return (void *)glXGetProcAddress((const GLubyte*)name);
+#endif
+
+//  patko: wglGetProcAddress doesn't work on my machine but GetProcAdress is ok
+#ifdef _WIN32
+    HMODULE module = LoadLibraryA("opengl32.dll");
+    void *p = (void *)GetProcAddress(module, name);
+#endif
 }
 
 static void node_to_atom(const mpv_node* node, std::vector<t_atom>& res)
@@ -182,7 +190,14 @@ mpv::mpv(int argc, t_atom*argv)
     error("failed to set VO");
     return;
   }
-
+#ifdef _WIN32 
+  if (mpv_set_option_string(m_mpv, "gpu-context", "angle") < 0)
+  {
+    error("failed to set option");
+    return;
+  }
+#endif 
+ 
   mpv_request_event(m_mpv, MPV_EVENT_TICK, 1);
   mpv_set_wakeup_callback(m_mpv, wakeup, this);
 }
