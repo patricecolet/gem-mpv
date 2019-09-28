@@ -18,7 +18,9 @@ build:w64 section
     cd ~/gem-mpv
     make
 
-Then you will find a `gem_mpv.dll` in gem-mpv folder.
+Then you will find a `gem_mpv.dll` in gem-mpv folder, but to run it out of the box it might need a bunch of dlls.
+
+    find . -name "*.dll" -exec ./localdeps.win.sh {} +
 
 this is a fork from : https://github.com/avilleret/gem-mpv
 
