@@ -10,6 +10,20 @@ static void wakeup(void *ctx)
   static_cast<mpv*>(ctx)->rise_event_flag();
 }
 
+void *GetAnyGLFuncAddress(const char *name)
+{
+  void *p = (void *)wglGetProcAddress(name);
+  if(p == 0 ||
+    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+    (p == (void*)-1) )
+  {
+    HMODULE module = LoadLibraryA("opengl32.dll");
+    p = (void *)GetProcAddress(module, name);
+  }
+
+  return p;
+}
+
 static void *get_proc_address_mpv(void *fn_ctx, const char *name)
 {
   // TODO adapt for Windows and MacOS
@@ -17,10 +31,9 @@ static void *get_proc_address_mpv(void *fn_ctx, const char *name)
   return (void *)glXGetProcAddress((const GLubyte*)name);
 #endif
 
-//  patko: wglGetProcAddress doesn't work on my machine but GetProcAdress is ok
+//  patko: try out on Windows
 #ifdef _WIN32
-    HMODULE module = LoadLibraryA("opengl32.dll");
-    void *p = (void *)GetProcAddress(module, name);
+  return (void *)GetAnyGLFuncAddress((LPCSTR)name);
 #endif
 }
 
