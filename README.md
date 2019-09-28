@@ -1,7 +1,6 @@
 # gem-mpv
 
 Bring the power of `libmpv` into `Gem`.
-windows building with msys64
 
 ## Building
 
