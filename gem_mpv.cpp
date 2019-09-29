@@ -10,6 +10,7 @@ static void wakeup(void *ctx)
   static_cast<mpv*>(ctx)->rise_event_flag();
 }
 
+#ifdef _WIN32
 void *GetAnyGLFuncAddress(const char *name)
 {
   void *p = (void *)wglGetProcAddress(name);
@@ -20,9 +21,9 @@ void *GetAnyGLFuncAddress(const char *name)
     HMODULE module = LoadLibraryA("opengl32.dll");
     p = (void *)GetProcAddress(module, name);
   }
-
   return p;
 }
+#endif
 
 static void *get_proc_address_mpv(void *fn_ctx, const char *name)
 {
