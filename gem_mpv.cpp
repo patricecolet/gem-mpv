@@ -204,20 +204,22 @@ mpv::mpv(int argc, t_atom*argv)
     error("failed to set VO");
     return;
   }
-#ifdef _WIN32 
-  if (mpv_set_option_string(m_mpv, "gpu-context", "angle") < 0)
-  {
-    error("failed to set option");
-    return;
-  }
-#endif 
+// #ifdef _WIN32 
+  // if (mpv_set_option_string(m_mpv, "gpu-context", "angle") < 0)
+  // {
+    // error("failed to set option");
+    // return;
+  // }
+// #endif 
  
   mpv_request_event(m_mpv, MPV_EVENT_TICK, 1);
   mpv_set_wakeup_callback(m_mpv, wakeup, this);
 }
 
+
 mpv::~mpv()
 {
+
   if(m_mpv)
     mpv_terminate_destroy(m_mpv);
 }
@@ -377,7 +379,17 @@ void mpv::render(GemState *state)
     gemframebuffer::render(state);
     if(m_mpv_gl)
     {
-      mpv_opengl_cb_draw(m_mpv_gl, m_frameBufferIndex, m_width, m_height);
+		    mpv_render_param params[] = {
+        {MPV_RENDER_PARAM_OPENGL_FBO, new (mpv_opengl_fbo){
+            .fbo = (int) m_frameBufferIndex,
+            .w = m_width,
+            .h = m_height
+        }}
+    };
+		//deprecated
+    //  mpv_opengl_cb_draw(m_mpv_gl, m_frameBufferIndex, m_width, m_height);
+       mpv_render_context_render(m_mpv_gl, params);
+	  
     }
   }
 }
@@ -399,8 +411,22 @@ void mpv::startRendering(void)
 
   // The OpenGL API is somewhat separate from the normal mpv API. This only
   // returns NULL if no OpenGL support is compiled.
-  m_mpv_gl = static_cast<mpv_opengl_cb_context*>(mpv_get_sub_api(m_mpv, MPV_SUB_API_OPENGL_CB));
-  if (!m_mpv_gl)
+  // 
+  // mpv_opengl_cb_context deprecated in new API
+/*  m_mpv_gl = static_cast<mpv_opengl_cb_context*>(mpv_get_sub_api(m_mpv, MPV_SUB_API_OPENGL_CB));
+   if (!m_mpv_gl)
+  {
+    error("failed to create mpv GL API handle");
+    return;
+  } */
+      mpv_render_param params[] = {
+                {MPV_RENDER_PARAM_API_TYPE, const_cast<char*>(MPV_RENDER_API_TYPE_OPENGL)},
+                {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, static_cast<void*>(new (mpv_opengl_init_params){
+                        .get_proc_address = get_proc_address_mpv,
+                })},
+                {MPV_RENDER_PARAM_INVALID}
+        };                   
+    if (mpv_render_context_create(&m_mpv_gl, m_mpv, params) < 0)
   {
     error("failed to create mpv GL API handle");
     return;
@@ -408,11 +434,11 @@ void mpv::startRendering(void)
 
   // This makes mpv use the currently set GL context. It will use the callback
   // to resolve GL builtin functions, as well as extensions.
-  if (mpv_opengl_cb_init_gl(m_mpv_gl, NULL, get_proc_address_mpv, NULL) < 0)
+/*   if (mpv_opengl_cb_init_gl(m_mpv_gl, NULL, get_proc_address_mpv, NULL) < 0)
   {
     error("failed to initialize mpv GL context");
     return;
-  }
+  } */
 
   m_reload = true;
 }
@@ -422,8 +448,10 @@ void mpv::stopRendering(void)
   gemframebuffer::stopRendering();
 
   if(m_mpv_gl)
-    mpv_opengl_cb_uninit_gl(m_mpv_gl);
+//    mpv_opengl_cb_uninit_gl(m_mpv_gl);
+		mpv_render_context_free(m_mpv_gl);
 }
+
 
 void mpv::command_mess(t_symbol *s, int argc, t_atom *argv)
 {
